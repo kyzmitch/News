@@ -23,6 +23,8 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
                     completion(NewsNetworkService.Result.success(articles))
                 case .failure(_):
                     completion(NewsNetworkService.Result.failure(NewsNetworkService.Error.parseError))
+                default:
+                    completion(NewsNetworkService.Result.failure(NewsNetworkService.Error.unknownError))
                 }
             }
             else {
@@ -33,9 +35,25 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
     }
     
     func fetchArticleContent(articleId: Int, completion: @escaping ((NewsNetworkService.Result) -> Void)) {
-        let path: String = "news_content?id=" + String(articleId)
+        let path: String = "v1/news_content?id=" + String(articleId)
         
-        // Need implement
+        httpClient.sendRequest(path: path, method: .Get) { (data, response, error) in
+            if let data = data {
+                let parseResponse = TinkoffNewsNetworkSource.ResponseParser.parse(responseData: data)
+                switch parseResponse {
+                case .successArticleContent(let fullArticle):
+                    completion(NewsNetworkService.Result.successArticleContent(fullArticle))
+                case .failure(_):
+                    completion(NewsNetworkService.Result.failure(NewsNetworkService.Error.parseError))
+                default:
+                    completion(NewsNetworkService.Result.failure(NewsNetworkService.Error.unknownError))
+                }
+            }
+            else {
+                let error = NewsNetworkService.Error.noDataError
+                completion(NewsNetworkService.Result.failure(error))
+            }
+        }
     }
 }
 
@@ -43,6 +61,7 @@ extension TinkoffNewsNetworkSource {
     class ResponseParser {
         
         enum Result {
+            case successArticleContent(FullArticle)
             case successArticles([Article])
             case failure(ResponseParser.Error)
         }
@@ -91,6 +110,42 @@ extension TinkoffNewsNetworkSource {
                             return ResponseParser.Result.successArticles(articles)
                         }
                         
+                    }
+                    else if let jsonArticleContent = json["payload"] as? [String: AnyObject] {
+                        if let titleJson = jsonArticleContent["title"] as? [String: AnyObject]{
+                            guard let articleIdString = titleJson["id"] as? String else {
+                                let error = Error.unknown
+                                return ResponseParser.Result.failure(error)
+                            }
+                            guard let articleId = Int(articleIdString) else {
+                                let error = Error.unknown
+                                return ResponseParser.Result.failure(error)
+                            }
+                            guard let titleText = titleJson["text"] as? String else {
+                                let error = Error.unknown
+                                return ResponseParser.Result.failure(error)
+                            }
+                            guard let publicationDateDictionary = titleJson["publicationDate"] as? [String: AnyObject] else {
+                                let error = Error.unknown
+                                return ResponseParser.Result.failure(error)
+                            }
+                            guard let milliseconds = publicationDateDictionary["milliseconds"] as? Int else {
+                                let error = Error.unknown
+                                return ResponseParser.Result.failure(error)
+                            }
+                            let publicationDate = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000.0)
+                            guard let content = jsonArticleContent["content"] as? String else {
+                                let error = Error.unknown
+                                return ResponseParser.Result.failure(error)
+                            }
+                            
+                            let fullArticle = FullArticle(backendId: articleId,
+                                                          titleText: String(htmlEncodedString: titleText),
+                                                          publicationDate: publicationDate,
+                                                          content: content)
+                            
+                            return ResponseParser.Result.successArticleContent(fullArticle)
+                        }
                     }
                 }
             }

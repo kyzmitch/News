@@ -23,6 +23,8 @@
 		C7F679BD1E866D9E00AC73B5 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F679BC1E866D9E00AC73B5 /* CoreDataManager.swift */; };
 		C7F679BF1E86852B00AC73B5 /* ArticlesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F679BE1E86852B00AC73B5 /* ArticlesViewModel.swift */; };
 		C7F679C21E868C7C00AC73B5 /* Storyboard+News.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F679C11E868C7C00AC73B5 /* Storyboard+News.swift */; };
+		C7F679C41E86F20100AC73B5 /* ArticleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F679C31E86F20100AC73B5 /* ArticleViewController.swift */; };
+		C7F679C61E86F37300AC73B5 /* NewsServiceHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F679C51E86F37300AC73B5 /* NewsServiceHolder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +46,8 @@
 		C7F679BC1E866D9E00AC73B5 /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CoreDataManager.swift; path = Managers/CoreDataManager.swift; sourceTree = "<group>"; };
 		C7F679BE1E86852B00AC73B5 /* ArticlesViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ArticlesViewModel.swift; path = Models/ArticlesViewModel.swift; sourceTree = "<group>"; };
 		C7F679C11E868C7C00AC73B5 /* Storyboard+News.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Storyboard+News.swift"; path = "Extensions/Storyboard+News.swift"; sourceTree = "<group>"; };
+		C7F679C31E86F20100AC73B5 /* ArticleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ArticleViewController.swift; path = News/ArticleViewController.swift; sourceTree = "<group>"; };
+		C7F679C51E86F37300AC73B5 /* NewsServiceHolder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NewsServiceHolder.swift; path = Services/NewsServiceHolder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +102,7 @@
 				C712AA6E1E85A3BA007D8A14 /* NewsListViewController.swift */,
 				C712AA711E85A584007D8A14 /* NewsCollectionViewDelegate.swift */,
 				C712AA731E85A717007D8A14 /* ArticleTitleViewCell.swift */,
+				C7F679C31E86F20100AC73B5 /* ArticleViewController.swift */,
 			);
 			name = News;
 			sourceTree = "<group>";
@@ -108,6 +113,7 @@
 				C712AA761E85A777007D8A14 /* HttpClient.swift */,
 				C7F679B61E86653800AC73B5 /* NewsNetworkService.swift */,
 				C7F679B41E865D1E00AC73B5 /* TinkoffNewsNetworkSource.swift */,
+				C7F679C51E86F37300AC73B5 /* NewsServiceHolder.swift */,
 			);
 			name = Services;
 			sourceTree = "<group>";
@@ -169,6 +175,7 @@
 				TargetAttributes = {
 					C712AA551E85A136007D8A14 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = ERT5B59458;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -211,6 +218,7 @@
 			files = (
 				C712AA5C1E85A137007D8A14 /* BaseViewController.swift in Sources */,
 				C7F679BF1E86852B00AC73B5 /* ArticlesViewModel.swift in Sources */,
+				C7F679C61E86F37300AC73B5 /* NewsServiceHolder.swift in Sources */,
 				C712AA721E85A584007D8A14 /* NewsCollectionViewDelegate.swift in Sources */,
 				C712AA741E85A717007D8A14 /* ArticleTitleViewCell.swift in Sources */,
 				C7F679B71E86653800AC73B5 /* NewsNetworkService.swift in Sources */,
@@ -218,6 +226,7 @@
 				C7F679B51E865D1E00AC73B5 /* TinkoffNewsNetworkSource.swift in Sources */,
 				C712AA621E85A137007D8A14 /* News.xcdatamodeld in Sources */,
 				C712AA771E85A777007D8A14 /* HttpClient.swift in Sources */,
+				C7F679C41E86F20100AC73B5 /* ArticleViewController.swift in Sources */,
 				C712AA5A1E85A137007D8A14 /* AppDelegate.swift in Sources */,
 				C7F679C21E868C7C00AC73B5 /* Storyboard+News.swift in Sources */,
 				C712AA6F1E85A3BA007D8A14 /* NewsListViewController.swift in Sources */,
@@ -344,6 +353,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = ERT5B59458;
 				INFOPLIST_FILE = News/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -357,6 +367,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = ERT5B59458;
 				INFOPLIST_FILE = News/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

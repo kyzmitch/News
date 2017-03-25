@@ -8,8 +8,26 @@
 
 import Foundation
 
-struct Article {
+protocol LightArticleModel {
+    var backendId: Int { get }
+    var titleText: String { get }
+    var publicationDate: Date { get }
+}
+
+protocol ArticleContentDataModel {
+    var content: String { get }
+}
+
+struct Article: LightArticleModel {
     let backendId: Int
     let titleText: String
     let publicationDate: Date
+}
+
+struct FullArticle: LightArticleModel, ArticleContentDataModel {
+    let backendId: Int
+    let titleText: String
+    let publicationDate: Date
+    
+    let content: String
 }

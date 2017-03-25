@@ -8,7 +8,7 @@
 
 import UIKit
 
-class NewsListViewController: BaseViewController {
+class NewsListViewController: BaseViewController, NewsServiceHolder {
 
     @IBOutlet weak var newsCollectionView: UICollectionView!
     @IBOutlet weak var loadingView: UIView!
@@ -36,11 +36,13 @@ class NewsListViewController: BaseViewController {
         fetchNews()
     }
     
-    public func add(newsService: NewsNetworkService) {
+    func add(newsService: NewsNetworkService) {
         self.newsService = newsService
+        self.collectionViewDelegate.add(newsService: newsService)
     }
     
     private func setup() {
+        self.collectionViewDelegate.presentingController = self
         self.newsCollectionView.dataSource = collectionViewDelegate
         self.newsCollectionView.delegate = collectionViewDelegate
         self.newsCollectionView.reloadData()
@@ -93,6 +95,8 @@ class NewsListViewController: BaseViewController {
             case .success(let articles):
                 let viewModel = ArticlesViewModel(lightArticlesArray: articles)
                 self?.dataMode = DataMode.content(viewModel)
+            default:
+                break
             }
             
             DispatchQueue.main.async {

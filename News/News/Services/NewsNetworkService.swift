@@ -16,6 +16,7 @@ protocol NewsNetworkServiceDataSource {
 struct NewsNetworkService {
     
     enum Result {
+        case successArticleContent(FullArticle)
         case success([Article])
         case failure(NewsNetworkService.Error)
     }

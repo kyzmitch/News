@@ -10,9 +10,16 @@ import Foundation
 import UIKit
 
 extension UIStoryboard {
+    enum StoryboardName: String {
+        case News = "News"
+    }
     static func newsScreen() -> NewsListViewController {
-        let storyboardName = "News"
-        let storyboard = UIStoryboard(name: storyboardName, bundle: nil)
+        let storyboard = UIStoryboard(name: StoryboardName.News.rawValue, bundle: nil)
         return storyboard.instantiateViewController(withIdentifier: "kNewsListScreenId") as! NewsListViewController
+    }
+    
+    static func articleScreen() -> ArticleViewController {
+        let storyboard = UIStoryboard(name: StoryboardName.News.rawValue, bundle: nil)
+        return storyboard.instantiateViewController(withIdentifier: "kArticleScreenId") as! ArticleViewController
     }
 }

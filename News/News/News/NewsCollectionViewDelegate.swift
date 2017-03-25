@@ -8,9 +8,15 @@
 
 import UIKit
 
-class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollectionViewDelegate {
+class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollectionViewDelegate, NewsServiceHolder {
     
     public var model: ArticlesViewModel?
+    private var newsService: NewsNetworkService!
+    public weak var presentingController: UIViewController?
+    
+    func add(newsService: NewsNetworkService) {
+        self.newsService = newsService
+    }
 
     func configureArticleTitle(_ cell: ArticleTitleViewCell, at indexPath: IndexPath) {
         cell.label.text = self.model?.titleForArticle(number: indexPath.row)
@@ -35,6 +41,27 @@ class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        guard let articleId = self.model?.articleIdFor(index: indexPath.row) else {
+            return
+        }
+        if articleId == -1 {
+            return
+        }
+        self.newsService.fetchArticle(articleId: articleId) { [weak self] (result) in
+            
+            switch result {
+            case .successArticleContent(let fullArticle):
+                DispatchQueue.main.async {
+                    let articleScreen = UIStoryboard.articleScreen()
+                    articleScreen.set(articleFullModel: fullArticle)
+                    let navigationScreen = UINavigationController(rootViewController: articleScreen)
+                    self?.presentingController?.present(navigationScreen, animated: true, completion: nil)
+                }
+                break
+                
+            default:
+                break
+            }
+        }
     }
 }
