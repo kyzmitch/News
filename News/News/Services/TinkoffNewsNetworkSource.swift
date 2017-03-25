@@ -75,7 +75,7 @@ extension TinkoffNewsNetworkSource {
                                 guard let titleText = dictionary["text"] as? String else {
                                     continue
                                 }
-                                let article = Article(backendId: articleId, titleText: titleText)
+                                let article = Article(backendId: articleId, titleText: String(htmlEncodedString: titleText))
                                 articles.append(article)
                             }
                             
@@ -90,5 +90,25 @@ extension TinkoffNewsNetworkSource {
             return ResponseParser.Result.failure(error)
         }
         
+    }
+}
+
+extension String {
+    init(htmlEncodedString: String) {
+        var attributedString: NSAttributedString?
+        if let encodedData = htmlEncodedString.data(using: String.Encoding.utf8) {
+            let attributedOptions : [String: AnyObject] = [
+                NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType as AnyObject,
+                NSCharacterEncodingDocumentAttribute: NSNumber(value: String.Encoding.utf8.rawValue) as AnyObject
+            ]
+            attributedString = try? NSAttributedString(data: encodedData, options: attributedOptions, documentAttributes: nil)
+        }
+        
+        if let attributedString = attributedString {
+            self.init(attributedString.string)!
+        }
+        else{
+            self.init(htmlEncodedString)!
+        }
     }
 }
