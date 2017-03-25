@@ -11,9 +11,19 @@ import Foundation
 struct ArticlesViewModel {
     
     private var articles: [Article]!
+    static let formatter = { () -> DateFormatter in
+        let formatter = DateFormatter()
+        
+        formatter.dateFormat = "dd-MM-yyyy HH:mm:ss"
+        formatter.locale = NSLocale(localeIdentifier: "ru") as Locale!
+        return formatter
+    }()
     
     init(lightArticlesArray: [Article]) {
         articles = lightArticlesArray
+        articles.sort { ( left: Article, right: Article) -> Bool in
+            return left.publicationDate.compare(right.publicationDate) == .orderedDescending
+        }
     }
     
     public func count() -> Int {
@@ -29,4 +39,15 @@ struct ArticlesViewModel {
             return article.titleText
         }
     }
+    
+    public func publicationDateString(articleNumber: Int) -> String? {
+        if articleNumber >= articles.count {
+            return nil
+        }
+        else{
+            let article = articles[articleNumber]
+            return ArticlesViewModel.formatter.string(from: article.publicationDate)
+        }
+    }
 }
+

@@ -75,7 +75,16 @@ extension TinkoffNewsNetworkSource {
                                 guard let titleText = dictionary["text"] as? String else {
                                     continue
                                 }
-                                let article = Article(backendId: articleId, titleText: String(htmlEncodedString: titleText))
+                                guard let publicationDateDictionary = dictionary["publicationDate"] as? [String: AnyObject] else {
+                                    continue
+                                }
+                                guard let milliseconds = publicationDateDictionary["milliseconds"] as? Int else {
+                                    continue
+                                }
+                                let publicationDate = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000.0)
+                                let article = Article(backendId: articleId,
+                                                      titleText: String(htmlEncodedString: titleText),
+                                                      publicationDate: publicationDate)
                                 articles.append(article)
                             }
                             

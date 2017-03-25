@@ -34,16 +34,16 @@ class NewsListViewController: BaseViewController {
         
         self.newsService.fetchNews { [weak self] (result) in
             
+            switch result {
+            case .failure( _):
+                self?.dataMode = .loading
+                break
+            case .success(let articles):
+                let viewModel = ArticlesViewModel(lightArticlesArray: articles)
+                self?.dataMode = DataMode.content(viewModel)
+            }
+            
             DispatchQueue.main.async {
-                switch result {
-                case .failure( _):
-                    self?.dataMode = .loading
-                    break
-                case .success(let articles):
-                    let viewModel = ArticlesViewModel(lightArticlesArray: articles)
-                    self?.dataMode = DataMode.content(viewModel)
-                }
-                
                 self?.updateUi()
             }
         }

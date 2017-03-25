@@ -12,4 +12,5 @@ class ArticleTitleViewCell: UICollectionViewCell {
     static let cellIdentifier = "kArticleTitleCellId"
     
     @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var publicationLabel: UILabel!
 }

@@ -14,6 +14,8 @@ class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollec
 
     func configureArticleTitle(_ cell: ArticleTitleViewCell, at indexPath: IndexPath) {
         cell.label.text = self.model?.titleForArticle(number: indexPath.row)
+        let publicationDate = self.model?.publicationDateString(articleNumber: indexPath.row)
+        cell.publicationLabel.text = publicationDate
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {

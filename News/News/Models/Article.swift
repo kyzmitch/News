@@ -11,4 +11,5 @@ import Foundation
 struct Article {
     let backendId: Int
     let titleText: String
+    let publicationDate: Date
 }
