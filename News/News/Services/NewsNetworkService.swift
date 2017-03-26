@@ -17,15 +17,15 @@ struct NewsNetworkService {
     
     enum Result {
         case successArticleContent(FullArticle)
-        case success([Article])
-        case failure(NewsNetworkService.Error)
+        case success([LightArticleModel])
+        case failure(NewsNetworkService.NewsError)
     }
     
-    enum Error {
+    enum NewsError {
         case unknownError
         case noDataError
         case parseError
-        case networkError(NSError)
+        case networkError(Error)
     }
     
     let dataSource: NewsNetworkServiceDataSource

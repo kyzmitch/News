@@ -19,7 +19,7 @@ struct ArticlesViewModel {
         return formatter
     }()
     
-    init(lightArticlesArray: [Article]) {
+    init(lightArticlesArray: [LightArticleModel]) {
         articles = lightArticlesArray
         articles.sort { ( left: LightArticleModel, right: LightArticleModel) -> Bool in
             return left.publicationDate.compare(right.publicationDate) == .orderedDescending

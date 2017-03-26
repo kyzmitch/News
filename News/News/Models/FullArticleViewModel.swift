@@ -20,7 +20,8 @@ struct FullArticleViewModel {
         return article.titleText
     }
     
-    public func contentHtmlText() -> String {
+    public func contentHtmlText() -> String? {
+        
         return self.article.content
     }
 }

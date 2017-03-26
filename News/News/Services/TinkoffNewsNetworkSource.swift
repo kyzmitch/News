@@ -13,23 +13,36 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
     private static let baseApiUrlString = "api.tinkoff.ru"
     
     let httpClient = HttpClient(baseApiUrlString: baseApiUrlString)
+    let cacheClient = CacheClient()
     
     func fetchNews(completion: @escaping ((NewsNetworkService.Result) -> Void)) {
         httpClient.sendRequest(path: "v1/news", method: .Get) { (data, response, error) in
-            if let data = data {
-                let parseResponse = TinkoffNewsNetworkSource.ResponseParser.parse(responseData: data)
-                switch parseResponse {
-                case .successArticles(let articles):
-                    completion(NewsNetworkService.Result.success(articles))
-                case .failure(_):
-                    completion(NewsNetworkService.Result.failure(NewsNetworkService.Error.parseError))
-                default:
-                    completion(NewsNetworkService.Result.failure(NewsNetworkService.Error.unknownError))
+            if let error = error {
+                if let cachedNews = self.cacheClient.fetchNews() {
+                    completion(NewsNetworkService.Result.success(cachedNews))
+                }
+                else{
+                    let enumErr = NewsNetworkService.NewsError.networkError(error)
+                    completion(NewsNetworkService.Result.failure(enumErr))
                 }
             }
             else {
-                let error = NewsNetworkService.Error.noDataError
-                completion(NewsNetworkService.Result.failure(error))
+                if let data = data {
+                    let parseResponse = TinkoffNewsNetworkSource.ResponseParser.parse(responseData: data)
+                    switch parseResponse {
+                    case .successArticles(let articles):
+                        completion(NewsNetworkService.Result.success(articles))
+                        self.cacheClient.saveTinkoffNews(articles: articles)
+                    case .failure(_):
+                        completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.parseError))
+                    default:
+                        completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.unknownError))
+                    }
+                }
+                else {
+                    let error = NewsNetworkService.NewsError.noDataError
+                    completion(NewsNetworkService.Result.failure(error))
+                }
             }
         }
     }
@@ -38,20 +51,26 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
         let path: String = "v1/news_content?id=" + String(articleId)
         
         httpClient.sendRequest(path: path, method: .Get) { (data, response, error) in
-            if let data = data {
-                let parseResponse = TinkoffNewsNetworkSource.ResponseParser.parse(responseData: data)
-                switch parseResponse {
-                case .successArticleContent(let fullArticle):
-                    completion(NewsNetworkService.Result.successArticleContent(fullArticle))
-                case .failure(_):
-                    completion(NewsNetworkService.Result.failure(NewsNetworkService.Error.parseError))
-                default:
-                    completion(NewsNetworkService.Result.failure(NewsNetworkService.Error.unknownError))
-                }
+            if let error = error {
+                let enumErr = NewsNetworkService.NewsError.networkError(error)
+                completion(NewsNetworkService.Result.failure(enumErr))
             }
             else {
-                let error = NewsNetworkService.Error.noDataError
-                completion(NewsNetworkService.Result.failure(error))
+                if let data = data {
+                    let parseResponse = TinkoffNewsNetworkSource.ResponseParser.parse(responseData: data)
+                    switch parseResponse {
+                    case .successArticleContent(let fullArticle):
+                        completion(NewsNetworkService.Result.successArticleContent(fullArticle))
+                    case .failure(_):
+                        completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.parseError))
+                    default:
+                        completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.unknownError))
+                    }
+                }
+                else {
+                    let error = NewsNetworkService.NewsError.noDataError
+                    completion(NewsNetworkService.Result.failure(error))
+                }
             }
         }
     }

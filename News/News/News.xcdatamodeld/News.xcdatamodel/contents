@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <elements/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16D32" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CdArticle" representedClassName="CdArticle" syncable="YES" codeGenerationType="class">
+        <attribute name="backendId" attributeType="Integer 64" usesScalarValueType="YES" indexed="YES" syncable="YES"/>
+        <attribute name="content" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="publicationDate" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="title" attributeType="String" syncable="YES"/>
+        <relationship name="newsList" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CdNews" inverseName="tinkoff" inverseEntity="CdNews" syncable="YES"/>
+    </entity>
+    <entity name="CdNews" representedClassName="CdNews" syncable="YES" codeGenerationType="class">
+        <relationship name="tinkoff" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CdArticle" inverseName="newsList" inverseEntity="CdArticle" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="CdArticle" positionX="-63" positionY="-18" width="128" height="120"/>
+        <element name="CdNews" positionX="-54" positionY="18" width="128" height="60"/>
+    </elements>
 </model>

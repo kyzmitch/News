@@ -28,11 +28,6 @@ class NewsListViewController: BaseViewController, NewsServiceHolder {
 
         setup()
         updateUi()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
         fetchNews()
     }
     
@@ -86,6 +81,9 @@ class NewsListViewController: BaseViewController, NewsServiceHolder {
     }
     
     private func fetchNews() {
+        self.collectionViewDelegate.model = nil
+        self.newsCollectionView.reloadData()
+        
         self.newsService.fetchNews { [weak self] (result) in
             
             switch result {

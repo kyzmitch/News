@@ -15,7 +15,7 @@ protocol LightArticleModel {
 }
 
 protocol ArticleContentDataModel {
-    var content: String { get }
+    var content: String? { get }
 }
 
 struct Article: LightArticleModel {
@@ -25,9 +25,10 @@ struct Article: LightArticleModel {
 }
 
 struct FullArticle: LightArticleModel, ArticleContentDataModel {
+
     let backendId: Int
     let titleText: String
     let publicationDate: Date
     
-    let content: String
+    var content: String?
 }
