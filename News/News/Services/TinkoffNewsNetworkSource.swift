@@ -52,8 +52,13 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
         
         httpClient.sendRequest(path: path, method: .Get) { (data, response, error) in
             if let error = error {
-                let enumErr = NewsNetworkService.NewsError.networkError(error)
-                completion(NewsNetworkService.Result.failure(enumErr))
+                if let article = self.cacheClient.fetchArticle(articleId: articleId) {
+                    completion(NewsNetworkService.Result.successArticleContent(article))
+                }
+                else{
+                    let enumErr = NewsNetworkService.NewsError.networkError(error)
+                    completion(NewsNetworkService.Result.failure(enumErr))
+                }
             }
             else {
                 if let data = data {
@@ -61,6 +66,7 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
                     switch parseResponse {
                     case .successArticleContent(let fullArticle):
                         completion(NewsNetworkService.Result.successArticleContent(fullArticle))
+                        self.cacheClient.saveArticle(article: fullArticle)
                     case .failure(_):
                         completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.parseError))
                     default:

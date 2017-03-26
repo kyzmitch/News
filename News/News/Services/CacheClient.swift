@@ -52,6 +52,44 @@ struct CacheClient {
         
         return fetchedNews
     }
+    
+    func fetchArticle(articleId: Int) -> FullArticle? {
+        var fetchedArticle: FullArticle?
+        let context = CoreDataManager.shared.persistentContainer.newBackgroundContext()
+        context.performAndWait {
+            let articleRequest: NSFetchRequest<CdArticle> = CdArticle.fetchRequest()
+            articleRequest.predicate = NSPredicate(format: "backendId = %d && content.length > 0", articleId)
+            if let fullArticleArray = try? context.fetch(articleRequest) as [CdArticle] {
+                if fullArticleArray.count > 0 {
+                    fetchedArticle = fullArticleArray[0].fullArticleObject()
+                }
+            }
+        }
+        
+        return fetchedArticle
+    }
+    
+    func saveArticle(article: FullArticle) -> Void {
+        let context = CoreDataManager.shared.persistentContainer.newBackgroundContext()
+        context.performAndWait {
+            var found: Bool = false
+            let articleRequest: NSFetchRequest<CdArticle> = CdArticle.fetchRequest()
+            articleRequest.predicate = NSPredicate(format: "backendId = %d", article.backendId)
+            if let fullArticleArray = try? context.fetch(articleRequest) as [CdArticle] {
+                if fullArticleArray.count > 0 {
+                    let fetchedArticle = fullArticleArray[0]
+                    fetchedArticle.fillInWith(article: article)
+                    found = true
+                }
+            }
+            
+            if found == false {
+                let cdArticle = CdArticle(context: context)
+                cdArticle.fillInWith(article: article)
+            }
+            try? context.save()
+        }
+    }
 }
 
 extension CdNews {
@@ -74,17 +112,33 @@ extension CdNews {
             guard let cdArticle = obj as? CdArticle else {
                 continue
             }
-            guard let title = cdArticle.title else {
-                continue
+            
+            if let article = cdArticle.fullArticleObject() {
+                articles.append(article)
             }
-            guard let date = cdArticle.publicationDate else {
-                continue
-            }
-
-            let article = FullArticle(backendId: Int(cdArticle.backendId), titleText: title, publicationDate: date as Date, content: cdArticle.content)
-            articles.append(article)
         }
         
         return articles
+    }
+}
+
+extension CdArticle {
+    func fullArticleObject() -> FullArticle? {
+        guard let title = self.title else {
+            return nil
+        }
+        guard let date = self.publicationDate else {
+            return nil
+        }
+        
+        let article = FullArticle(backendId: Int(self.backendId), titleText: title, publicationDate: date as Date, content: self.content)
+        return article
+    }
+    
+    func fillInWith(article: FullArticle) {
+        self.backendId = Int64(article.backendId)
+        self.content = article.content
+        self.title = article.titleText
+        self.publicationDate = article.publicationDate as NSDate?
     }
 }
