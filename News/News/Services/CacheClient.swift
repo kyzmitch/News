@@ -18,9 +18,7 @@ struct CacheClient {
             if let newsArray = try? context.fetch(newsRequest) as [CdNews] {
                 if newsArray.count > 0 {
                     let newsContainer = newsArray[0]
-                    if let tinkoffNews = newsContainer.tinkoff {
-                        newsContainer.removeFromTinkoff(tinkoffNews)
-                    }
+                    newsContainer.tinkoff = nil
                     newsContainer.rewriteTinkoffNews(articles: articles, on: context)
                 }
                 else{
@@ -86,6 +84,14 @@ struct CacheClient {
             if found == false {
                 let cdArticle = CdArticle(context: context)
                 cdArticle.fillInWith(article: article)
+                // attach to news container
+                let newsRequest: NSFetchRequest<CdNews> = CdNews.fetchRequest()
+                if let newsArray = try? context.fetch(newsRequest) as [CdNews] {
+                    if newsArray.count > 0 {
+                        let newsContainer = newsArray[0]
+                        newsContainer.addToTinkoff(cdArticle)
+                    }
+                }
             }
             try? context.save()
         }

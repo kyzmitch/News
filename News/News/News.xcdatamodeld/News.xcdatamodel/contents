@@ -8,7 +8,7 @@
         <relationship name="newsList" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CdNews" inverseName="tinkoff" inverseEntity="CdNews" syncable="YES"/>
     </entity>
     <entity name="CdNews" representedClassName="CdNews" syncable="YES" codeGenerationType="class">
-        <relationship name="tinkoff" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CdArticle" inverseName="newsList" inverseEntity="CdArticle" syncable="YES"/>
+        <relationship name="tinkoff" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CdArticle" inverseName="newsList" inverseEntity="CdArticle" syncable="YES"/>
     </entity>
     <elements>
         <element name="CdArticle" positionX="-63" positionY="-18" width="128" height="120"/>
