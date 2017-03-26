@@ -53,7 +53,7 @@ class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollec
             case .successArticleContent(let fullArticle):
                 DispatchQueue.main.async {
                     let articleScreen = UIStoryboard.articleScreen()
-                    articleScreen.set(articleFullModel: fullArticle)
+                    articleScreen.setViewModel(articleFullViewModel: FullArticleViewModel(fullArticle: fullArticle))
                     let navigationScreen = UINavigationController(rootViewController: articleScreen)
                     self?.presentingController?.present(navigationScreen, animated: true, completion: nil)
                 }

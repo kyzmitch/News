@@ -13,4 +13,11 @@ class ArticleTitleViewCell: UICollectionViewCell {
     
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var publicationLabel: UILabel!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.layer.borderWidth = 1.0
+        self.layer.borderColor = UIColor.black.cgColor
+    }
 }
