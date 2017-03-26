@@ -18,6 +18,8 @@ struct CacheClient {
             if let newsArray = try? context.fetch(newsRequest) as [CdNews] {
                 if newsArray.count > 0 {
                     let newsContainer = newsArray[0]
+                    // TODO: fix clearing of news, full articles with content text
+                    // are not removed
                     newsContainer.tinkoff = nil
                     newsContainer.rewriteTinkoffNews(articles: articles, on: context)
                 }

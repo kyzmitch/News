@@ -106,6 +106,7 @@ extension TinkoffNewsNetworkSource {
             if let jsonObject = jsonObject {
                 if let json = jsonObject as? [String: AnyObject] {
                     if let jsonArticles = json["payload"] as? [AnyObject] {
+                        // TODO: fix copy paste
                         if let payloads = jsonArticles as? [[String: AnyObject]] {
                             var articles = [Article]()
                             for dictionary: [String: AnyObject] in payloads {
@@ -137,6 +138,7 @@ extension TinkoffNewsNetworkSource {
                         
                     }
                     else if let jsonArticleContent = json["payload"] as? [String: AnyObject] {
+                        // TODO: fix copy paste
                         if let titleJson = jsonArticleContent["title"] as? [String: AnyObject]{
                             guard let articleIdString = titleJson["id"] as? String else {
                                 let error = Error.unknown
