@@ -21,7 +21,7 @@ class NewsListViewController: BaseViewController, NewsServiceHolder {
         case content(ArticlesViewModel)
     }
     
-    private var dataMode = DataMode.loading
+    private var dataMode: DataMode = .loading
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,71 +33,79 @@ class NewsListViewController: BaseViewController, NewsServiceHolder {
     
     func add(newsService: NewsNetworkService) {
         self.newsService = newsService
-        self.collectionViewDelegate.add(newsService: newsService)
+        collectionViewDelegate.add(newsService: newsService)
     }
     
     private func setup() {
-        self.collectionViewDelegate.presentingController = self
-        self.newsCollectionView.dataSource = collectionViewDelegate
-        self.newsCollectionView.delegate = collectionViewDelegate
-        self.newsCollectionView.reloadData()
+        collectionViewDelegate.presentingController = self
+        newsCollectionView.dataSource = collectionViewDelegate
+        newsCollectionView.delegate = collectionViewDelegate
         
-        self.refreshControl.removeTarget(self, action: nil, for: UIControlEvents.valueChanged)
-        self.refreshControl.addTarget(self, action: #selector(refreshControlAction), for: UIControlEvents.valueChanged)
-        self.newsCollectionView .addSubview(self.refreshControl)
-        self.newsCollectionView.alwaysBounceVertical = true
+        refreshControl.removeTarget(self, action: nil, for: UIControlEvents.valueChanged)
+        refreshControl.addTarget(self, action: #selector(refreshControlAction), for: UIControlEvents.valueChanged)
+        newsCollectionView.addSubview(refreshControl)
+        newsCollectionView.alwaysBounceVertical = true
+        
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumInteritemSpacing = 2
+        layout.minimumLineSpacing = 2
+        layout.minimumLineSpacing = 4
+        newsCollectionView.collectionViewLayout = layout
     }
 
     private func updateUi() {
-        self.refreshControl.endRefreshing()
         
         switch self.dataMode {
         case .loading:
-            self.loadingView.alpha = 0
-            self.view.bringSubview(toFront: self.loadingView)
-            UIView.animate(withDuration: 1, animations: { 
-                self.loadingView.alpha = 1
+            loadingView.alpha = 0
+            view.bringSubview(toFront: self.loadingView)
+            UIView.animate(withDuration: 1, animations: { [weak self] in
+                self?.loadingView.alpha = 1
             })
             break
         case .content(let articlesViewModel):
-            self.collectionViewDelegate.model = articlesViewModel
-            self.newsCollectionView.reloadData()
+            collectionViewDelegate.model = articlesViewModel
+            newsCollectionView.reloadData()
             
-            let subviewsCount = self.view.subviews.count
+            let subviewsCount = view.subviews.count
             if subviewsCount > 0 {
                 // Determine if it already on top or not
-                if self.view.subviews[subviewsCount - 1] != self.newsCollectionView {
-                    self.newsCollectionView.alpha = 0
-                    self.view.bringSubview(toFront: self.newsCollectionView)
-                    UIView.animate(withDuration: 1, animations: {
-                        self.newsCollectionView.alpha = 1
+                if view.subviews[subviewsCount - 1] != newsCollectionView {
+                    newsCollectionView.alpha = 0
+                    view.bringSubview(toFront: newsCollectionView)
+                    UIView.animate(withDuration: 1, animations: { [weak self] in
+                        self?.newsCollectionView.alpha = 1
                     })
                 }
             }
-            
             
             break
         }
     }
     
     private func fetchNews() {
-        self.collectionViewDelegate.model = nil
-        self.newsCollectionView.reloadData()
+        collectionViewDelegate.model = nil
+        newsCollectionView.reloadData()
         
-        self.newsService.fetchNews { [weak self] (result) in
+        newsService.fetchNews { [weak self] (result) in
             
             switch result {
             case .failure( _):
                 self?.dataMode = .loading
                 break
             case .success(let articles):
-                let viewModel = ArticlesViewModel(lightArticlesArray: articles)
-                self?.dataMode = DataMode.content(viewModel)
+                let viewModel = ArticlesViewModel(lightArticlesArray: articles,
+                                                  interfaceIdiom: UIDevice.current.userInterfaceIdiom)
+                self?.dataMode = .content(viewModel)
             default:
+                self?.dataMode = .loading
                 break
             }
             
             DispatchQueue.main.async {
+                if let me = self,  me.refreshControl.isRefreshing {
+                    me.refreshControl.endRefreshing()
+                }
                 self?.updateUi()
             }
         }

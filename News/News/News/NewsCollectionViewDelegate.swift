@@ -8,7 +8,7 @@
 
 import UIKit
 
-class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollectionViewDelegate, NewsServiceHolder {
+class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, NewsServiceHolder {
     
     public var model: ArticlesViewModel?
     private var newsService: NewsNetworkService!
@@ -18,35 +18,39 @@ class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollec
         self.newsService = newsService
     }
 
-    func configureArticleTitle(_ cell: ArticleTitleViewCell, at indexPath: IndexPath) {
-        cell.label.text = self.model?.titleForArticle(number: indexPath.row)
-        let publicationDate = self.model?.publicationDateString(articleNumber: indexPath.row)
+    func configureArticle(_ cell: ArticleTitleViewCell, at indexPath: IndexPath, on collectionView: UICollectionView) {
+        guard let model = model else {
+            return
+        }
+        cell.label.text = model.titleForArticle(indexPath: indexPath)
+        let publicationDate = model.publicationDateString(indexPath: indexPath)
         cell.publicationLabel.text = publicationDate
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let model = self.model else {
+        guard let model = model else {
             return 0
         }
-        return model.count()
+        return model.sectionsCount()
+    }
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        guard let model = model else {
+            return 0
+        }
+        return model.articlesCount(section: section)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ArticleTitleViewCell.cellIdentifier, for: indexPath) as! ArticleTitleViewCell
-        configureArticleTitle(cell, at: indexPath)
+        configureArticle(cell, at: indexPath, on: collectionView)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let articleId = self.model?.articleIdFor(index: indexPath.row) else {
+        guard let articleId = self.model?.articleId(indexPath: indexPath) else {
             return
         }
-        if articleId == -1 {
-            return
-        }
+        
         self.newsService.fetchArticle(articleId: articleId) { [weak self] (result) in
             
             switch result {
@@ -63,5 +67,12 @@ class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollec
                 break
             }
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        guard let model = model else {
+            return CGSize.zero
+        }
+        return model.cellSize(inside: collectionView)
     }
 }
