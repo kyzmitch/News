@@ -103,82 +103,94 @@ extension TinkoffNewsNetworkSource {
             } catch let error as NSError {
                 print(error.description)
             }
-            if let jsonObject = jsonObject {
-                if let json = jsonObject as? [String: AnyObject] {
-                    if let jsonArticles = json["payload"] as? [AnyObject] {
-                        // TODO: fix copy paste
-                        if let payloads = jsonArticles as? [[String: AnyObject]] {
-                            var articles = [Article]()
-                            for dictionary: [String: AnyObject] in payloads {
-                                
-                                guard let articleIdString = dictionary["id"] as? String else {
-                                    continue
-                                }
-                                guard let articleId = Int(articleIdString) else {
-                                    continue
-                                }
-                                guard let titleText = dictionary["text"] as? String else {
-                                    continue
-                                }
-                                guard let publicationDateDictionary = dictionary["publicationDate"] as? [String: AnyObject] else {
-                                    continue
-                                }
-                                guard let milliseconds = publicationDateDictionary["milliseconds"] as? Int else {
-                                    continue
-                                }
-                                let publicationDate = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000.0)
-                                let article = Article(backendId: articleId,
-                                                      titleText: String(htmlEncodedString: titleText),
-                                                      publicationDate: publicationDate)
-                                articles.append(article)
-                            }
-                            
-                            return ResponseParser.Result.successArticles(articles)
-                        }
-                        
-                    }
-                    else if let jsonArticleContent = json["payload"] as? [String: AnyObject] {
-                        // TODO: fix copy paste
-                        if let titleJson = jsonArticleContent["title"] as? [String: AnyObject]{
-                            guard let articleIdString = titleJson["id"] as? String else {
-                                let error = Error.unknown
-                                return ResponseParser.Result.failure(error)
-                            }
-                            guard let articleId = Int(articleIdString) else {
-                                let error = Error.unknown
-                                return ResponseParser.Result.failure(error)
-                            }
-                            guard let titleText = titleJson["text"] as? String else {
-                                let error = Error.unknown
-                                return ResponseParser.Result.failure(error)
-                            }
-                            guard let publicationDateDictionary = titleJson["publicationDate"] as? [String: AnyObject] else {
-                                let error = Error.unknown
-                                return ResponseParser.Result.failure(error)
-                            }
-                            guard let milliseconds = publicationDateDictionary["milliseconds"] as? Int else {
-                                let error = Error.unknown
-                                return ResponseParser.Result.failure(error)
-                            }
-                            let publicationDate = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000.0)
-                            guard let content = jsonArticleContent["content"] as? String else {
-                                let error = Error.unknown
-                                return ResponseParser.Result.failure(error)
-                            }
-                            
-                            let fullArticle = FullArticle(backendId: articleId,
-                                                          titleText: String(htmlEncodedString: titleText),
-                                                          publicationDate: publicationDate,
-                                                          content: content)
-                            
-                            return ResponseParser.Result.successArticleContent(fullArticle)
-                        }
-                    }
-                }
+            
+            if jsonObject == nil {
+                let error = Error.unknown
+                return ResponseParser.Result.failure(error)
             }
 
-            let error = Error.unknown
-            return ResponseParser.Result.failure(error)
+            guard let json = jsonObject as? [String: AnyObject]  else {
+                let error = Error.unknown
+                return ResponseParser.Result.failure(error)
+            }
+            
+            switch json["payload"] {
+            case let array as [AnyObject]:
+                guard let payloads = array as? [[String: AnyObject]]  else {
+                    let error = Error.unknown
+                    return ResponseParser.Result.failure(error)
+                }
+                
+                var articles = [Article]()
+                
+                for dictionary: [String: AnyObject] in payloads {
+                    
+                    guard let articleIdString = dictionary["id"] as? String else {
+                        continue
+                    }
+                    guard let articleId = Int(articleIdString) else {
+                        continue
+                    }
+                    guard let titleText = dictionary["text"] as? String else {
+                        continue
+                    }
+                    guard let publicationDateDictionary = dictionary["publicationDate"] as? [String: AnyObject] else {
+                        continue
+                    }
+                    guard let milliseconds = publicationDateDictionary["milliseconds"] as? Int else {
+                        continue
+                    }
+                    let publicationDate = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000.0)
+                    let article = Article(backendId: articleId,
+                                          titleText: String(htmlEncodedString: titleText),
+                                          publicationDate: publicationDate)
+                    articles.append(article)
+                }
+                
+                return ResponseParser.Result.successArticles(articles)
+                
+            case let dictionary as [String: AnyObject]:
+                
+                guard let titleJson = dictionary["title"] as? [String: AnyObject] else {
+                    let error = Error.unknown
+                    return ResponseParser.Result.failure(error)
+                }
+                guard let articleIdString = titleJson["id"] as? String else {
+                    let error = Error.unknown
+                    return ResponseParser.Result.failure(error)
+                }
+                guard let articleId = Int(articleIdString) else {
+                    let error = Error.unknown
+                    return ResponseParser.Result.failure(error)
+                }
+                guard let titleText = titleJson["text"] as? String else {
+                    let error = Error.unknown
+                    return ResponseParser.Result.failure(error)
+                }
+                guard let publicationDateDictionary = titleJson["publicationDate"] as? [String: AnyObject] else {
+                    let error = Error.unknown
+                    return ResponseParser.Result.failure(error)
+                }
+                guard let milliseconds = publicationDateDictionary["milliseconds"] as? Int else {
+                    let error = Error.unknown
+                    return ResponseParser.Result.failure(error)
+                }
+                let publicationDate = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000.0)
+                guard let content = dictionary["content"] as? String else {
+                    let error = Error.unknown
+                    return ResponseParser.Result.failure(error)
+                }
+                
+                let fullArticle = FullArticle(backendId: articleId,
+                                              titleText: String(htmlEncodedString: titleText),
+                                              publicationDate: publicationDate,
+                                              content: content)
+                
+                return ResponseParser.Result.successArticleContent(fullArticle)
+            default:
+                let error = Error.unknown
+                return ResponseParser.Result.failure(error)
+            }
         }
         
     }
