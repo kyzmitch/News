@@ -17,10 +17,9 @@ enum InterfaceIdiom: UInt {
 struct ArticlesViewModel {
     
     private let articles: [LightArticleModel]!
-    private let padSections = 2
-    private let phoneSections = 1
     private let cellHeight: CGFloat = 68.0
     private let interface: InterfaceIdiom
+    public let sectionsNumber: Int!
     
     static let formatter = { () -> DateFormatter in
         let formatter = DateFormatter()
@@ -33,41 +32,39 @@ struct ArticlesViewModel {
     init(lightArticlesArray: [LightArticleModel], interfaceIdiom: InterfaceIdiom) {
         articles = lightArticlesArray
         interface = interfaceIdiom
+        switch interface {
+        case .phone:
+            sectionsNumber = 1
+        case .tablet:
+            sectionsNumber = 2
+        }
+        
         articles.sort { ( left: LightArticleModel, right: LightArticleModel) -> Bool in
             return left.publicationDate.compare(right.publicationDate) == .orderedDescending
         }
     }
     
-    public func cellSize(inside collectionViewFrame: CGRect) -> CGSize {
+    public func cellPreferredWidth(inside collectionViewFrame: CGRect) -> CGFloat {
         switch interface {
         case .tablet:
-            return CGSize(width: collectionViewFrame.width / 2 * 0.99, height: cellHeight)
+            return collectionViewFrame.width / 2 * 0.99
         default:
-            return CGSize(width: collectionViewFrame.width, height: cellHeight)
-        }
-    }
-    
-    public func sectionsCount() -> Int {
-        switch interface {
-        case .tablet:
-            return padSections
-        default:
-            return phoneSections
+            return collectionViewFrame.width
         }
     }
     
     public func articlesCount(section: Int = 0) -> Int {
         switch interface {
         case .tablet:
-            if section == padSections - 1 {
-                let count: Int = articles.count % padSections
+            if section == sectionsNumber - 1 {
+                let count: Int = articles.count % sectionsNumber
                 if count == 0 {
-                    return articles.count / padSections
+                    return articles.count / sectionsNumber
                 }
                 return count
             }
             else{
-                let count: Int = articles.count / padSections
+                let count: Int = articles.count / sectionsNumber
                 return count
             }
             

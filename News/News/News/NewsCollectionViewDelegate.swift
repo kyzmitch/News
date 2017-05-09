@@ -10,9 +10,9 @@ import UIKit
 
 class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, NewsServiceHolder {
     
-    public var model: ArticlesViewModel?
     private var newsService: NewsNetworkService!
     public weak var presentingController: UIViewController?
+    public var model: ArticlesViewModel?
     
     func add(newsService: NewsNetworkService) {
         self.newsService = newsService
@@ -22,6 +22,9 @@ class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollec
         guard let model = model else {
             return
         }
+    
+        ArticleTitleViewCell.preferredWidth = model.cellPreferredWidth(inside: collectionView.frame)
+        
         cell.label.text = model.titleForArticle(indexPath: indexPath)
         let publicationDate = model.publicationDateString(indexPath: indexPath)
         cell.publicationLabel.text = publicationDate
@@ -31,7 +34,7 @@ class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollec
         guard let model = model else {
             return 0
         }
-        return model.sectionsCount()
+        return model.sectionsNumber
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let model = model else {
@@ -67,12 +70,5 @@ class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollec
                 break
             }
         }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        guard let model = model else {
-            return CGSize.zero
-        }
-        return model.cellSize(inside: collectionView.frame)
     }
 }

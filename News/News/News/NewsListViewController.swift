@@ -50,6 +50,7 @@ class NewsListViewController: BaseViewController, NewsServiceHolder {
         layout.minimumInteritemSpacing = 2
         layout.minimumLineSpacing = 2
         layout.minimumLineSpacing = 4
+        layout.estimatedItemSize = CGSize(width: 50, height: 50)
         newsCollectionView.collectionViewLayout = layout
     }
 
