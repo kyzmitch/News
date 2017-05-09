@@ -94,9 +94,13 @@ class NewsListViewController: BaseViewController, NewsServiceHolder {
                 self?.dataMode = .loading
                 break
             case .success(let articles):
-                let viewModel = ArticlesViewModel(lightArticlesArray: articles,
-                                                  interfaceIdiom: UIDevice.current.userInterfaceIdiom)
-                self?.dataMode = .content(viewModel)
+                
+                if let interfaceIdiom = InterfaceIdiom.interfaceIdiomFrom(uikitInterfaceIdiom: UIDevice.current.userInterfaceIdiom) {
+                    let viewModel = ArticlesViewModel(lightArticlesArray: articles,
+                                                      interfaceIdiom: interfaceIdiom)
+                    self?.dataMode = .content(viewModel)
+                }
+                
             default:
                 self?.dataMode = .loading
                 break
@@ -113,5 +117,18 @@ class NewsListViewController: BaseViewController, NewsServiceHolder {
     
     @objc private func refreshControlAction() {
         fetchNews()
+    }
+}
+
+extension InterfaceIdiom {
+    static func interfaceIdiomFrom(uikitInterfaceIdiom: UIUserInterfaceIdiom) -> InterfaceIdiom? {
+        switch uikitInterfaceIdiom {
+        case .phone:
+            return InterfaceIdiom.phone
+        case .pad:
+            return InterfaceIdiom.tablet
+        default:
+            return nil
+        }
     }
 }

@@ -7,15 +7,20 @@
 //
 
 import Foundation
-import UIKit // only for interface idiom
+import CoreGraphics
+
+enum InterfaceIdiom: UInt {
+    case phone = 0
+    case tablet = 1
+}
 
 struct ArticlesViewModel {
     
     private let articles: [LightArticleModel]!
     private let padSections = 2
     private let phoneSections = 1
-    private let cellHeight = CGFloat(68)
-    private let interface: UIUserInterfaceIdiom
+    private let cellHeight: CGFloat = 68.0
+    private let interface: InterfaceIdiom
     
     static let formatter = { () -> DateFormatter in
         let formatter = DateFormatter()
@@ -25,7 +30,7 @@ struct ArticlesViewModel {
         return formatter
     }()
     
-    init(lightArticlesArray: [LightArticleModel], interfaceIdiom: UIUserInterfaceIdiom) {
+    init(lightArticlesArray: [LightArticleModel], interfaceIdiom: InterfaceIdiom) {
         articles = lightArticlesArray
         interface = interfaceIdiom
         articles.sort { ( left: LightArticleModel, right: LightArticleModel) -> Bool in
@@ -33,18 +38,18 @@ struct ArticlesViewModel {
         }
     }
     
-    public func cellSize(inside collectionView: UICollectionView) -> CGSize {
+    public func cellSize(inside collectionViewFrame: CGRect) -> CGSize {
         switch interface {
-        case .pad:
-            return CGSize(width: collectionView.frame.width / 2 * 0.99, height: cellHeight)
+        case .tablet:
+            return CGSize(width: collectionViewFrame.width / 2 * 0.99, height: cellHeight)
         default:
-            return CGSize(width: collectionView.frame.width, height: cellHeight)
+            return CGSize(width: collectionViewFrame.width, height: cellHeight)
         }
     }
     
     public func sectionsCount() -> Int {
         switch interface {
-        case .pad:
+        case .tablet:
             return padSections
         default:
             return phoneSections
@@ -53,7 +58,7 @@ struct ArticlesViewModel {
     
     public func articlesCount(section: Int = 0) -> Int {
         switch interface {
-        case .pad:
+        case .tablet:
             if section == padSections - 1 {
                 let count: Int = articles.count % padSections
                 if count == 0 {

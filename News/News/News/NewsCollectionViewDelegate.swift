@@ -73,6 +73,6 @@ class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollec
         guard let model = model else {
             return CGSize.zero
         }
-        return model.cellSize(inside: collectionView)
+        return model.cellSize(inside: collectionView.frame)
     }
 }
