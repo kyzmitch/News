@@ -24,6 +24,7 @@ class ArticleViewController: BaseViewController {
         
         self.articleTitle.layer.borderWidth = 1.0
         self.articleTitle.layer.borderColor = UIColor.black.cgColor
+        self.articleTitle.preferredMaxLayoutWidth = self.view.frame.width - 2;
         
         self.contentContainer.addSubview(self.contentWebView)
     }

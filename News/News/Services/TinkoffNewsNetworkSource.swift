@@ -12,8 +12,8 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
 
     private static let baseApiUrlString = "api.tinkoff.ru"
     
-    let httpClient = HttpClient(baseApiUrlString: baseApiUrlString)
-    let cacheClient = CacheClient()
+    private let httpClient = HttpClient(baseApiUrlString: baseApiUrlString)
+    private let cacheClient = CacheClient()
     
     func fetchNews(completion: @escaping ((NewsNetworkService.Result) -> Void)) {
         httpClient.sendRequest(path: "v1/news", method: .Get) { (data, response, error) in
@@ -33,8 +33,8 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
                     case .successArticles(let articles):
                         completion(NewsNetworkService.Result.success(articles))
                         self.cacheClient.saveTinkoffNews(articles: articles)
-                    case .failure(_):
-                        completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.parseError))
+                    case .failure(let parseError):
+                        completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.parseError(parseError)))
                     default:
                         completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.unknownError))
                     }
@@ -67,8 +67,8 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
                     case .successArticleContent(let fullArticle):
                         completion(NewsNetworkService.Result.successArticleContent(fullArticle))
                         self.cacheClient.saveArticle(article: fullArticle)
-                    case .failure(_):
-                        completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.parseError))
+                    case .failure(let parseError):
+                        completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.parseError(parseError)))
                     default:
                         completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.unknownError))
                     }
@@ -88,11 +88,7 @@ extension TinkoffNewsNetworkSource {
         enum Result {
             case successArticleContent(FullArticle)
             case successArticles([Article])
-            case failure(ResponseParser.Error)
-        }
-        
-        enum Error {
-            case unknown
+            case failure(ParseError)
         }
         
         static func parse(responseData data: Data) -> ResponseParser.Result {
@@ -101,23 +97,23 @@ extension TinkoffNewsNetworkSource {
             do {
                 jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
             } catch let error as NSError {
-                print(error.description)
+                print("\(type(of: self)): serialization error: \(error.description)")
             }
             
             if jsonObject == nil {
-                let error = Error.unknown
+                let error = ParseError.emptyJson
                 return ResponseParser.Result.failure(error)
             }
 
             guard let json = jsonObject as? [String: AnyObject]  else {
-                let error = Error.unknown
+                let error = ParseError.wrongJsonFormat
                 return ResponseParser.Result.failure(error)
             }
             
             switch json["payload"] {
             case let array as [AnyObject]:
                 guard let payloads = array as? [[String: AnyObject]]  else {
-                    let error = Error.unknown
+                    let error = ParseError.notExpectedSubKey
                     return ResponseParser.Result.failure(error)
                 }
                 
@@ -152,32 +148,32 @@ extension TinkoffNewsNetworkSource {
             case let dictionary as [String: AnyObject]:
                 
                 guard let titleJson = dictionary["title"] as? [String: AnyObject] else {
-                    let error = Error.unknown
+                    let error = ParseError.notExpectedSubKey
                     return ResponseParser.Result.failure(error)
                 }
                 guard let articleIdString = titleJson["id"] as? String else {
-                    let error = Error.unknown
+                    let error = ParseError.notFullObject
                     return ResponseParser.Result.failure(error)
                 }
                 guard let articleId = Int(articleIdString) else {
-                    let error = Error.unknown
+                    let error = ParseError.notFullObject
                     return ResponseParser.Result.failure(error)
                 }
                 guard let titleText = titleJson["text"] as? String else {
-                    let error = Error.unknown
+                    let error = ParseError.notFullObject
                     return ResponseParser.Result.failure(error)
                 }
                 guard let publicationDateDictionary = titleJson["publicationDate"] as? [String: AnyObject] else {
-                    let error = Error.unknown
+                    let error = ParseError.notExpectedSubKey
                     return ResponseParser.Result.failure(error)
                 }
                 guard let milliseconds = publicationDateDictionary["milliseconds"] as? Int else {
-                    let error = Error.unknown
+                    let error = ParseError.notFullObject
                     return ResponseParser.Result.failure(error)
                 }
                 let publicationDate = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000.0)
                 guard let content = dictionary["content"] as? String else {
-                    let error = Error.unknown
+                    let error = ParseError.notFullObject
                     return ResponseParser.Result.failure(error)
                 }
                 
@@ -188,7 +184,7 @@ extension TinkoffNewsNetworkSource {
                 
                 return ResponseParser.Result.successArticleContent(fullArticle)
             default:
-                let error = Error.unknown
+                let error = ParseError.notExpectedRootKey
                 return ResponseParser.Result.failure(error)
             }
         }

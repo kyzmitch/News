@@ -13,6 +13,15 @@ protocol NewsNetworkServiceDataSource {
     func fetchArticleContent(articleId: Int, completion: @escaping ((NewsNetworkService.Result) -> Void))
 }
 
+enum ParseError {
+    case unknown
+    case emptyJson
+    case wrongJsonFormat
+    case notExpectedRootKey
+    case notExpectedSubKey
+    case notFullObject
+}
+
 struct NewsNetworkService {
     
     enum Result {
@@ -24,11 +33,11 @@ struct NewsNetworkService {
     enum NewsError {
         case unknownError
         case noDataError
-        case parseError
+        case parseError(ParseError)
         case networkError(Error)
     }
     
-    let dataSource: NewsNetworkServiceDataSource
+    private let dataSource: NewsNetworkServiceDataSource
     
     init(dataSource: NewsNetworkServiceDataSource) {
         self.dataSource = dataSource

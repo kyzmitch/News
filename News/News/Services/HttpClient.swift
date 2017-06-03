@@ -13,16 +13,15 @@ enum HttpMethod: String {
     case Post = "POST"
 }
 
-class HttpClient: NSObject, URLSessionDelegate {
+struct HttpClient {
 
-    private var apiUrl: URL!
-    private var session: URLSession!
-    private static let defaultTimeout: TimeInterval = 10
+    private let apiUrl: URL!
+    private let session: URLSession!
+    private let defaultTimeout: TimeInterval = 10
     
     init(baseApiUrlString: String) {
-        super.init()
         apiUrl = URL(string: "https://" + baseApiUrlString)
-        session = URLSession(configuration: URLSessionConfiguration.ephemeral, delegate: self, delegateQueue: nil)
+        session = URLSession(configuration: URLSessionConfiguration.ephemeral, delegate: nil, delegateQueue: nil)
     }
     
     public func sendRequest(path: String, method: HttpMethod, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Swift.Void) {
@@ -34,15 +33,11 @@ class HttpClient: NSObject, URLSessionDelegate {
         }
         var request = URLRequest(url: url,
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
-                                 timeoutInterval: HttpClient.defaultTimeout)
+                                 timeoutInterval: self.defaultTimeout)
         
         request.addValue("application/xml,application/json;charset=UTF-8", forHTTPHeaderField: "Accept")
         request.httpMethod = method.rawValue
         let dataTask = self.session.dataTask(with: request, completionHandler: completionHandler)
         dataTask.resume()
-    }
-    
-    func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
-        
     }
 }
