@@ -17,7 +17,6 @@ enum InterfaceIdiom: UInt {
 struct ArticlesViewModel {
     
     private let articles: [LightArticleModel]!
-    private let cellHeight: CGFloat = 68.0
     private let interface: InterfaceIdiom
     public let sectionsNumber: Int!
     

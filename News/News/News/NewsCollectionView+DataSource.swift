@@ -8,15 +8,7 @@
 
 import UIKit
 
-class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, NewsServiceHolder {
-    
-    private var newsService: NewsNetworkService!
-    public weak var presentingController: UIViewController?
-    public var model: ArticlesViewModel?
-    
-    func add(newsService: NewsNetworkService) {
-        self.newsService = newsService
-    }
+extension NewsListViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
 
     func configureArticle(_ cell: ArticleTitleViewCell, at indexPath: IndexPath, on collectionView: UICollectionView) {
         guard let model = model else {
@@ -62,7 +54,7 @@ class NewsCollectionViewDelegate: NSObject, UICollectionViewDataSource, UICollec
                     let articleScreen = UIStoryboard.articleScreen()
                     articleScreen.setViewModel(articleFullViewModel: FullArticleViewModel(fullArticle: fullArticle))
                     let navigationScreen = UINavigationController(rootViewController: articleScreen)
-                    self?.presentingController?.present(navigationScreen, animated: true, completion: nil)
+                    self?.present(navigationScreen, animated: true, completion: nil)
                 }
                 break
                 

@@ -13,8 +13,8 @@ class NewsListViewController: BaseViewController, NewsServiceHolder {
     @IBOutlet weak var newsCollectionView: UICollectionView!
     @IBOutlet weak var loadingView: UIView!
     let refreshControl = UIRefreshControl()
-    private let collectionViewDelegate = NewsCollectionViewDelegate()
-    private var newsService: NewsNetworkService!
+    internal var newsService: NewsNetworkService!
+    internal var model: ArticlesViewModel?
     
     private enum DataMode {
         case loading
@@ -28,18 +28,21 @@ class NewsListViewController: BaseViewController, NewsServiceHolder {
 
         setup()
         updateUi()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
         fetchNews()
     }
     
     func add(newsService: NewsNetworkService) {
         self.newsService = newsService
-        collectionViewDelegate.add(newsService: newsService)
     }
     
     private func setup() {
-        collectionViewDelegate.presentingController = self
-        newsCollectionView.dataSource = collectionViewDelegate
-        newsCollectionView.delegate = collectionViewDelegate
+        newsCollectionView.dataSource = self
+        newsCollectionView.delegate = self
         
         refreshControl.removeTarget(self, action: nil, for: UIControlEvents.valueChanged)
         refreshControl.addTarget(self, action: #selector(refreshControlAction), for: UIControlEvents.valueChanged)
@@ -65,7 +68,7 @@ class NewsListViewController: BaseViewController, NewsServiceHolder {
             })
             break
         case .content(let articlesViewModel):
-            collectionViewDelegate.model = articlesViewModel
+            self.model = articlesViewModel
             newsCollectionView.reloadData()
             
             let subviewsCount = view.subviews.count
@@ -85,7 +88,7 @@ class NewsListViewController: BaseViewController, NewsServiceHolder {
     }
     
     private func fetchNews() {
-        collectionViewDelegate.model = nil
+        self.model = nil
         newsCollectionView.reloadData()
         
         newsService.fetchNews { [weak self] (result) in

@@ -27,7 +27,7 @@ protocol NewsCacheSource {
     func createArticle(article: PONSOFullArticleModel, on context: NSManagedObjectContext) -> Void
 }
 
-struct CacheClient<T: NewsCacheSource> {
+struct NewsCacheClient<T: NewsCacheSource> {
     
     private let source: T
     

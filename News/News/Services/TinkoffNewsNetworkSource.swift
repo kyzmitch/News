@@ -13,7 +13,7 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
     private static let baseApiUrlString = "api.tinkoff.ru"
     
     private let httpClient = HttpClient(baseApiUrlString: baseApiUrlString)
-    private let cacheClient = CacheClient<TinkoffNewsCacheSource>(newsCacheSource: TinkoffNewsCacheSource())
+    private let cacheClient = NewsCacheClient<TinkoffNewsCacheSource>(newsCacheSource: TinkoffNewsCacheSource())
     
     func fetchNews(completion: @escaping ((NewsNetworkService.Result) -> Void)) {
         httpClient.sendRequest(path: "v1/news", method: .Get) { (data, response, error) in

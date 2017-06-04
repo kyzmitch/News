@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import UIKit // for atributed string
 
 struct FullArticleViewModel {
     private var article: FullArticle!
