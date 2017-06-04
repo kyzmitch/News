@@ -11,14 +11,20 @@ import CoreData
 
 protocol NewsCacheSource {
     associatedtype NewsModel: NSFetchRequestResult
+    associatedtype ArticleModel: NSFetchRequestResult
     associatedtype PONSOArticleModel
     associatedtype PONSOFullArticleModel
     
     func fetchAllNewsRequest() -> NSFetchRequest<NewsModel>
+    func fetchArticleRequest(by identifier: Int) -> NSFetchRequest<ArticleModel>
+    func fetchArticleRequest(usingIdFrom fullArticle: PONSOFullArticleModel) -> NSFetchRequest<ArticleModel>
     func clearAllNewsForModel(model: NewsModel) -> Void
     func saveArticles(articles: [PONSOArticleModel], to model:NewsModel, on context: NSManagedObjectContext) -> Void
     func createNewsModel(on context: NSManagedObjectContext) -> NewsModel
     func fetchNews(from model:NewsModel) -> [PONSOFullArticleModel]?
+    func firstArticle(from array:[ArticleModel]) -> PONSOFullArticleModel?
+    func updateFirstArticle(from array:[ArticleModel], with article:PONSOFullArticleModel) -> Void
+    func createArticle(article: PONSOFullArticleModel, on context: NSManagedObjectContext) -> Void
 }
 
 struct CacheClient<T: NewsCacheSource> {
@@ -69,15 +75,14 @@ struct CacheClient<T: NewsCacheSource> {
         return fetchedNews
     }
     
-    func fetchArticle(articleId: Int) -> FullArticle? {
-        var fetchedArticle: FullArticle?
+    func fetchArticle(articleId: Int) -> T.PONSOFullArticleModel? {
+        var fetchedArticle: T.PONSOFullArticleModel?
         let context = CoreDataManager.shared.persistentContainer.newBackgroundContext()
         context.performAndWait {
-            let articleRequest: NSFetchRequest<CdArticle> = CdArticle.fetchRequest()
-            articleRequest.predicate = NSPredicate(format: "backendId = %d && content.length > 0", articleId)
-            if let fullArticleArray = try? context.fetch(articleRequest) as [CdArticle] {
+            let articleRequest = self.source.fetchArticleRequest(by: articleId)
+            if let fullArticleArray = try? context.fetch(articleRequest) as [T.ArticleModel] {
                 if fullArticleArray.count > 0 {
-                    fetchedArticle = fullArticleArray[0].fullArticleObject()
+                    fetchedArticle = self.source.firstArticle(from: fullArticleArray)
                 }
             }
         }
@@ -85,84 +90,22 @@ struct CacheClient<T: NewsCacheSource> {
         return fetchedArticle
     }
     
-    func saveArticle(article: FullArticle) -> Void {
+    func saveArticle(article: T.PONSOFullArticleModel) -> Void {
         let context = CoreDataManager.shared.persistentContainer.newBackgroundContext()
         context.performAndWait {
             var found: Bool = false
-            let articleRequest: NSFetchRequest<CdArticle> = CdArticle.fetchRequest()
-            articleRequest.predicate = NSPredicate(format: "backendId = %d", article.backendId)
-            if let fullArticleArray = try? context.fetch(articleRequest) as [CdArticle] {
+            let articleRequest = self.source.fetchArticleRequest(usingIdFrom: article)
+            if let fullArticleArray = try? context.fetch(articleRequest) as [T.ArticleModel] {
                 if fullArticleArray.count > 0 {
-                    let fetchedArticle = fullArticleArray[0]
-                    fetchedArticle.fillInWith(article: article)
+                    self.source.updateFirstArticle(from: fullArticleArray, with: article)
                     found = true
                 }
             }
             
             if found == false {
-                let cdArticle = CdArticle(context: context)
-                cdArticle.fillInWith(article: article)
-                // attach to news container
-                let newsRequest: NSFetchRequest<CdNews> = CdNews.fetchRequest()
-                if let newsArray = try? context.fetch(newsRequest) as [CdNews] {
-                    if newsArray.count > 0 {
-                        let newsContainer = newsArray[0]
-                        newsContainer.addToTinkoff(cdArticle)
-                    }
-                }
+                self.source.createArticle(article: article, on: context)
             }
             try? context.save()
         }
-    }
-}
-
-extension CdNews {
-    func rewriteTinkoffNews(articles: [Article], on context: NSManagedObjectContext) {
-        for article in articles {
-            let cdArticle = CdArticle(context: context)
-            cdArticle.backendId = Int64(article.backendId)
-            cdArticle.title = article.titleText
-            cdArticle.publicationDate = article.publicationDate as NSDate?
-            self.addToTinkoff(cdArticle)
-        }
-    }
-    
-    func articlesFromTinkoffNews() -> [FullArticle] {
-        guard let tinkoffNews = self.tinkoff else {
-            return []
-        }
-        var articles = [FullArticle]()
-        for obj in tinkoffNews {
-            guard let cdArticle = obj as? CdArticle else {
-                continue
-            }
-            
-            if let article = cdArticle.fullArticleObject() {
-                articles.append(article)
-            }
-        }
-        
-        return articles
-    }
-}
-
-extension CdArticle {
-    func fullArticleObject() -> FullArticle? {
-        guard let title = self.title else {
-            return nil
-        }
-        guard let date = self.publicationDate else {
-            return nil
-        }
-        
-        let article = FullArticle(backendId: Int(self.backendId), titleText: title, publicationDate: date as Date, content: self.content)
-        return article
-    }
-    
-    func fillInWith(article: FullArticle) {
-        self.backendId = Int64(article.backendId)
-        self.content = article.content
-        self.title = article.titleText
-        self.publicationDate = article.publicationDate as NSDate?
     }
 }
