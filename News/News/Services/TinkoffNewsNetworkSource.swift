@@ -13,7 +13,7 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
     private static let baseApiUrlString = "api.tinkoff.ru"
     
     private let httpClient = HttpClient(baseApiUrlString: baseApiUrlString)
-    private let cacheClient = CacheClient()
+    private let cacheClient = CacheClient<TinkoffNewsCacheSource>(newsCacheSource: TinkoffNewsCacheSource())
     
     func fetchNews(completion: @escaping ((NewsNetworkService.Result) -> Void)) {
         httpClient.sendRequest(path: "v1/news", method: .Get) { (data, response, error) in
@@ -32,7 +32,7 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
                     switch parseResponse {
                     case .successArticles(let articles):
                         completion(NewsNetworkService.Result.success(articles))
-                        self.cacheClient.saveTinkoffNews(articles: articles)
+                        self.cacheClient.saveNews(articles: articles)
                     case .failure(let parseError):
                         completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.parseError(parseError)))
                     default:

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		844D47F51EE3CD9A0053672C /* TinkoffNewsCacheSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844D47F41EE3CD9A0053672C /* TinkoffNewsCacheSource.swift */; };
 		C712AA5A1E85A137007D8A14 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C712AA591E85A137007D8A14 /* AppDelegate.swift */; };
 		C712AA5C1E85A137007D8A14 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C712AA5B1E85A137007D8A14 /* BaseViewController.swift */; };
 		C712AA5F1E85A137007D8A14 /* News.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C712AA5D1E85A137007D8A14 /* News.storyboard */; };
@@ -30,6 +31,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		844D47F41EE3CD9A0053672C /* TinkoffNewsCacheSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TinkoffNewsCacheSource.swift; path = Services/TinkoffNewsCacheSource.swift; sourceTree = "<group>"; };
 		C712AA561E85A137007D8A14 /* News.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = News.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C712AA591E85A137007D8A14 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C712AA5B1E85A137007D8A14 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 			children = (
 				C712AA761E85A777007D8A14 /* HttpClient.swift */,
 				C72799D61E87F51400CDC6B4 /* CacheClient.swift */,
+				844D47F41EE3CD9A0053672C /* TinkoffNewsCacheSource.swift */,
 				C7F679B61E86653800AC73B5 /* NewsNetworkService.swift */,
 				C7F679B41E865D1E00AC73B5 /* TinkoffNewsNetworkSource.swift */,
 				C7F679C51E86F37300AC73B5 /* NewsServiceHolder.swift */,
@@ -236,6 +239,7 @@
 				C712AA771E85A777007D8A14 /* HttpClient.swift in Sources */,
 				C7F679C41E86F20100AC73B5 /* ArticleViewController.swift in Sources */,
 				C712AA5A1E85A137007D8A14 /* AppDelegate.swift in Sources */,
+				844D47F51EE3CD9A0053672C /* TinkoffNewsCacheSource.swift in Sources */,
 				C7F679C21E868C7C00AC73B5 /* Storyboard+News.swift in Sources */,
 				C712AA6F1E85A3BA007D8A14 /* NewsListViewController.swift in Sources */,
 				C7F679BD1E866D9E00AC73B5 /* CoreDataManager.swift in Sources */,

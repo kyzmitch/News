@@ -9,43 +9,59 @@
 import Foundation
 import CoreData
 
-struct CacheClient {
+protocol NewsCacheSource {
+    associatedtype NewsModel: NSFetchRequestResult
+    associatedtype PONSOArticleModel
+    associatedtype PONSOFullArticleModel
     
-    func saveTinkoffNews(articles: [Article]) {
+    func fetchAllNewsRequest() -> NSFetchRequest<NewsModel>
+    func clearAllNewsForModel(model: NewsModel) -> Void
+    func saveArticles(articles: [PONSOArticleModel], to model:NewsModel, on context: NSManagedObjectContext) -> Void
+    func createNewsModel(on context: NSManagedObjectContext) -> NewsModel
+    func fetchNews(from model:NewsModel) -> [PONSOFullArticleModel]?
+}
+
+struct CacheClient<T: NewsCacheSource> {
+    
+    private let source: T
+    
+    init(newsCacheSource: T) {
+        source = newsCacheSource
+    }
+    
+    func saveNews(articles: [T.PONSOArticleModel]) {
         let context = CoreDataManager.shared.persistentContainer.newBackgroundContext()
         context.perform {
-            let newsRequest: NSFetchRequest<CdNews> = CdNews.fetchRequest()
-            if let newsArray = try? context.fetch(newsRequest) as [CdNews] {
+            let newsRequest = self.source.fetchAllNewsRequest()
+            if let newsArray = try? context.fetch(newsRequest) as [T.NewsModel] {
                 if newsArray.count > 0 {
                     let newsContainer = newsArray[0]
-                    // TODO: fix clearing of news, full articles with content text
-                    // are not removed
-                    newsContainer.tinkoff = nil
-                    newsContainer.rewriteTinkoffNews(articles: articles, on: context)
+                    self.source.clearAllNewsForModel(model: newsContainer)
+                    self.source.saveArticles(articles: articles, to: newsContainer, on: context)
                 }
                 else{
-                    let newsContainer = CdNews(context: context)
-                    newsContainer.rewriteTinkoffNews(articles: articles, on: context)
+                    let newsContainer = self.source.createNewsModel(on: context)
+                    self.source.saveArticles(articles: articles, to: newsContainer, on: context)
                 }
             }
             else{
-                let newsContainer = CdNews(context: context)
-                newsContainer.rewriteTinkoffNews(articles: articles, on: context)
+                let newsContainer = self.source.createNewsModel(on: context)
+                self.source.saveArticles(articles: articles, to: newsContainer, on: context)
             }
             
             try? context.save()
         }
     }
     
-    func fetchNews() -> [FullArticle]?  {
-        var fetchedNews: [FullArticle]?
+    func fetchNews() -> [T.PONSOFullArticleModel]?  {
+        var fetchedNews: [T.PONSOFullArticleModel]?
         let context = CoreDataManager.shared.persistentContainer.newBackgroundContext()
         context.performAndWait {
-            let newsRequest: NSFetchRequest<CdNews> = CdNews.fetchRequest()
-            if let newsArray = try? context.fetch(newsRequest) as [CdNews] {
+            let newsRequest = self.source.fetchAllNewsRequest()
+            if let newsArray = try? context.fetch(newsRequest) as [T.NewsModel] {
                 if newsArray.count > 0 {
                     let newsContainer = newsArray[0]
-                    fetchedNews = newsContainer.articlesFromTinkoffNews()
+                    fetchedNews = self.source.fetchNews(from: newsContainer)
                 }
             }
         }
