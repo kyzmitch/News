@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		844D47F51EE3CD9A0053672C /* TinkoffNewsCacheSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844D47F41EE3CD9A0053672C /* TinkoffNewsCacheSource.swift */; };
-		844D47FC1EE458B40053672C /* ReactiveSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844D47F71EE455E30053672C /* ReactiveSwift.framework */; };
-		844D47FD1EE458BF0053672C /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 844D47F91EE455FA0053672C /* Result.framework */; };
 		C712AA5A1E85A137007D8A14 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C712AA591E85A137007D8A14 /* AppDelegate.swift */; };
 		C712AA5C1E85A137007D8A14 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C712AA5B1E85A137007D8A14 /* BaseViewController.swift */; };
 		C712AA5F1E85A137007D8A14 /* News.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C712AA5D1E85A137007D8A14 /* News.storyboard */; };
@@ -65,8 +63,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				844D47FD1EE458BF0053672C /* Result.framework in Frameworks */,
-				844D47FC1EE458B40053672C /* ReactiveSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
