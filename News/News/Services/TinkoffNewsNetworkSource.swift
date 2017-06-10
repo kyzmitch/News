@@ -196,9 +196,9 @@ extension String {
     init(htmlEncodedString: String) {
         var attributedString: NSAttributedString?
         if let encodedData = htmlEncodedString.data(using: String.Encoding.utf8) {
-            let attributedOptions : [String: AnyObject] = [
-                NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType as AnyObject,
-                NSCharacterEncodingDocumentAttribute: NSNumber(value: String.Encoding.utf8.rawValue) as AnyObject
+            let attributedOptions : [NSAttributedString.DocumentReadingOptionKey: Any] = [
+                NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html as Any,
+                NSAttributedString.DocumentReadingOptionKey.characterEncoding: NSNumber(value: String.Encoding.utf8.rawValue) as Any
             ]
             attributedString = try? NSAttributedString(data: encodedData, options: attributedOptions, documentAttributes: nil)
         }

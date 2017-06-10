@@ -41,7 +41,7 @@ class ArticleViewController: BaseViewController {
         self.articleModel = articleFullViewModel
     }
     
-    func handleBackPress() {
+    @objc func handleBackPress() {
         self.dismiss(animated: true, completion: nil)
     }
     
