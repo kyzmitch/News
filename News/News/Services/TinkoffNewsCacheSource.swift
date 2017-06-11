@@ -81,7 +81,11 @@ extension CdNews {
             let cdArticle = CdArticle(context: context)
             cdArticle.backendId = Int64(article.backendId)
             cdArticle.title = article.titleText
-            cdArticle.publicationDate = article.publicationDate as NSDate?
+            #if swift(>=4.0)
+                cdArticle.publicationDate = article.publicationDate
+            #else
+                cdArticle.publicationDate = article.publicationDate as NSDate
+            #endif
             self.addToTinkoff(cdArticle)
         }
     }
@@ -122,6 +126,11 @@ extension CdArticle {
         self.backendId = Int64(article.backendId)
         self.content = article.content
         self.title = article.titleText
-        self.publicationDate = article.publicationDate as NSDate?
+        
+        #if swift(>=4.0)
+            self.publicationDate = article.publicationDate
+        #else
+            self.publicationDate = article.publicationDate as NSDate
+        #endif
     }
 }

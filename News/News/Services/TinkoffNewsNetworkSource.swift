@@ -196,10 +196,18 @@ extension String {
     init(htmlEncodedString: String) {
         var attributedString: NSAttributedString?
         if let encodedData = htmlEncodedString.data(using: String.Encoding.utf8) {
-            let attributedOptions : [NSAttributedString.DocumentReadingOptionKey: Any] = [
-                NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html as Any,
-                NSAttributedString.DocumentReadingOptionKey.characterEncoding: NSNumber(value: String.Encoding.utf8.rawValue) as Any
-            ]
+            #if swift(>=4.0)
+                let attributedOptions : [NSAttributedString.DocumentReadingOptionKey: Any] = [
+                    NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html as Any,
+                    NSAttributedString.DocumentReadingOptionKey.characterEncoding: NSNumber(value: String.Encoding.utf8.rawValue) as Any
+                ]
+            #else
+                let attributedOptions : [String: AnyObject] = [
+                    NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType as AnyObject,
+                    NSCharacterEncodingDocumentAttribute: NSNumber(value: String.Encoding.utf8.rawValue) as AnyObject
+                ]
+            #endif
+            
             attributedString = try? NSAttributedString(data: encodedData, options: attributedOptions, documentAttributes: nil)
         }
         
