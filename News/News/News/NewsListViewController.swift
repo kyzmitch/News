@@ -28,11 +28,6 @@ class NewsListViewController: BaseViewController, NewsServiceHolder {
 
         setup()
         updateUi()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
         fetchNews()
     }
     
