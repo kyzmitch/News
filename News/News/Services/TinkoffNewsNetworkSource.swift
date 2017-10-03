@@ -26,12 +26,23 @@ class TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
                     completion(NewsNetworkService.Result.failure(enumErr))
                 }
             }
-            else {
-                if data.map({return TinkoffNewsNetworkSource.ResponseParser.parse(responseData: $0)}).map({[weak self] in self?.handle(parsed: $0)}).map({completion($0)}) == nil {
-                    let error = NewsNetworkService.NewsError.noDataError
-                    completion(NewsNetworkService.Result.failure(error))
-                }
+            else if data == nil {
+                let error = NewsNetworkService.NewsError.noDataError
+                completion(NewsNetworkService.Result.failure(error))
             }
+            else {
+                data.map({return TinkoffNewsNetworkSource.ResponseParser.parse(responseData: $0)}).map({[weak self] in self?.handle(parsed: $0)}).map({TinkoffNewsNetworkSource.execute(completion, with: $0)})
+            }
+        }
+    }
+    
+    private static func execute(_ networkCompletion: @escaping ((NewsNetworkService.Result) -> Void), with networkResult: NewsNetworkService.Result?) -> Void {
+        if let networkResult = networkResult {
+            networkCompletion(networkResult)
+        }
+        else {
+            let error = NewsNetworkService.NewsError.unknownError
+            networkCompletion(NewsNetworkService.Result.failure(error))
         }
     }
     
