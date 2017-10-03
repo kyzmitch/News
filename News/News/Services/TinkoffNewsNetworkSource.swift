@@ -8,7 +8,7 @@
 
 import UIKit
 
-struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
+class TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
 
     private static let baseApiUrlString = "api.tinkoff.ru"
     
@@ -27,23 +27,23 @@ struct TinkoffNewsNetworkSource: NewsNetworkServiceDataSource {
                 }
             }
             else {
-                if let data = data {
-                    let parseResponse = TinkoffNewsNetworkSource.ResponseParser.parse(responseData: data)
-                    switch parseResponse {
-                    case .successArticles(let articles):
-                        completion(NewsNetworkService.Result.success(articles))
-                        self.cacheClient.saveNews(articles: articles)
-                    case .failure(let parseError):
-                        completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.parseError(parseError)))
-                    default:
-                        completion(NewsNetworkService.Result.failure(NewsNetworkService.NewsError.unknownError))
-                    }
-                }
-                else {
+                if data.map({return TinkoffNewsNetworkSource.ResponseParser.parse(responseData: $0)}).map({[weak self] in self?.handle(parsed: $0)}).map({completion($0)}) == nil {
                     let error = NewsNetworkService.NewsError.noDataError
                     completion(NewsNetworkService.Result.failure(error))
                 }
             }
+        }
+    }
+    
+    private func handle(parsed result: ResponseParser.Result) -> NewsNetworkService.Result {
+        switch result {
+        case .successArticles(let articles):
+            cacheClient.saveNews(articles: articles)
+            return NewsNetworkService.Result.success(articles)
+        case .failure(let parseError):
+            return NewsNetworkService.Result.failure(NewsNetworkService.NewsError.parseError(parseError))
+        default:
+            return NewsNetworkService.Result.failure(NewsNetworkService.NewsError.unknownError)
         }
     }
     
