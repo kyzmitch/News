@@ -130,29 +130,34 @@ extension TinkoffNewsNetworkSource {
                 
                 var articles = [Article]()
                 
-                for dictionary: [String: AnyObject] in payloads {
-                    
+                let lock = PThreadMutex()
+                
+                DispatchQueue.concurrentPerform(iterations: payloads.count, execute: { (index: Int) in
+                    let dictionary = payloads[index]
                     guard let articleIdString = dictionary["id"] as? String else {
-                        continue
+                        return
                     }
                     guard let articleId = Int(articleIdString) else {
-                        continue
+                        return
                     }
                     guard let titleText = dictionary["text"] as? String else {
-                        continue
+                        return
                     }
                     guard let publicationDateDictionary = dictionary["publicationDate"] as? [String: AnyObject] else {
-                        continue
+                        return
                     }
                     guard let milliseconds = publicationDateDictionary["milliseconds"] as? Int else {
-                        continue
+                        return
                     }
                     let publicationDate = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000.0)
                     let article = Article(backendId: articleId,
                                           titleText: String(htmlEncodedString: titleText),
                                           publicationDate: publicationDate)
-                    articles.append(article)
-                }
+                    
+                    lock.sync(execute: { () -> Void in
+                        articles.append(article)
+                    })
+                })
                 
                 return ResponseParser.Result.successArticles(articles)
                 

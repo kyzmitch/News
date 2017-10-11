@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		362E0F9987A28FAEB62878B1 /* Pods_News.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3632AA991FE9E913DBA013AA /* Pods_News.framework */; };
+		840630511F8E0B7000DC511A /* CwlMutex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840630501F8E0B7000DC511A /* CwlMutex.swift */; };
 		844D47F51EE3CD9A0053672C /* TinkoffNewsCacheSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844D47F41EE3CD9A0053672C /* TinkoffNewsCacheSource.swift */; };
 		C712AA5A1E85A137007D8A14 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C712AA591E85A137007D8A14 /* AppDelegate.swift */; };
 		C712AA5C1E85A137007D8A14 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C712AA5B1E85A137007D8A14 /* BaseViewController.swift */; };
@@ -33,6 +34,7 @@
 
 /* Begin PBXFileReference section */
 		3632AA991FE9E913DBA013AA /* Pods_News.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_News.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		840630501F8E0B7000DC511A /* CwlMutex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CwlMutex.swift; sourceTree = "<group>"; };
 		844D47F41EE3CD9A0053672C /* TinkoffNewsCacheSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TinkoffNewsCacheSource.swift; path = Services/TinkoffNewsCacheSource.swift; sourceTree = "<group>"; };
 		A18D26D76278A761D703B50C /* Pods-News.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-News.release.xcconfig"; path = "Pods/Target Support Files/Pods-News/Pods-News.release.xcconfig"; sourceTree = "<group>"; };
 		B75AB5115162E30B7808D2C7 /* Pods-News.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-News.debug.xcconfig"; path = "Pods/Target Support Files/Pods-News/Pods-News.debug.xcconfig"; sourceTree = "<group>"; };
@@ -81,6 +83,14 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		840630521F8E0B7400DC511A /* 3rdParty */ = {
+			isa = PBXGroup;
+			children = (
+				840630501F8E0B7000DC511A /* CwlMutex.swift */,
+			);
+			name = 3rdParty;
+			sourceTree = "<group>";
+		};
 		844D47F61EE455E30053672C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -110,6 +120,7 @@
 		C712AA581E85A137007D8A14 /* News */ = {
 			isa = PBXGroup;
 			children = (
+				840630521F8E0B7400DC511A /* 3rdParty */,
 				C7F679C01E868C5D00AC73B5 /* Extensions */,
 				C7F679BB1E866D7300AC73B5 /* Managers */,
 				C7F679B81E8665BC00AC73B5 /* Models */,
@@ -329,6 +340,7 @@
 				C72799D71E87F51400CDC6B4 /* NewsCacheClient.swift in Sources */,
 				C7F679C61E86F37300AC73B5 /* NewsServiceHolder.swift in Sources */,
 				C712AA721E85A584007D8A14 /* NewsCollectionView+DataSource.swift in Sources */,
+				840630511F8E0B7000DC511A /* CwlMutex.swift in Sources */,
 				C712AA741E85A717007D8A14 /* ArticleTitleViewCell.swift in Sources */,
 				C7F679B71E86653800AC73B5 /* NewsNetworkService.swift in Sources */,
 				C7F679BA1E8665E200AC73B5 /* Article.swift in Sources */,
